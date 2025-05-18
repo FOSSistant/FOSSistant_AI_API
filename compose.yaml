@@ -1,0 +1,9 @@
+services:
+  fossistant-model-server:
+    build: .
+    restart: unless-stopped
+    container_name: fossistant-model-server
+    ports:
+      - 80:80
+    volumes:
+      - ./models:/code/models:ro

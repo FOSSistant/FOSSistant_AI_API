@@ -1,9 +1,11 @@
 import time
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Depends
 from pydantic import BaseModel
 
 from transformers import pipeline
+
+from app.auth import get_api_key
 
 
 class Issue(BaseModel):
@@ -33,7 +35,7 @@ async def add_process_time_header(request: Request, call_next):
 
 
 @app.post("/v1/fossistant/difficulty/")
-async def predict_difficulty(issues: Issues | Issue):
+async def predict_difficulty(issues: Issues | Issue, api_key: str = Depends(get_api_key)):
     if isinstance(issues, Issues):
         results = []
 

@@ -44,6 +44,28 @@ FOSSistant AI API Server is designed to serve AI models for FOSSistant in a cont
 
 The API documentation is available at `http://localhost/docs` when the server is running.
 
+## Configuration
+
+The API server now requires API key authentication for accessing its endpoints.
+
+### API Key Setup
+
+1.  **Environment Variable**:
+    *   Set the `VALID_API_KEYS` environment variable. This variable should contain a comma-separated string of all valid API keys.
+    *   Example: `VALID_API_KEYS="yourSecretKey1,anotherSecureKey2,prodKeyXYZ"`
+    *   **Important**: The server will fail to start if the `VALID_API_KEYS` environment variable is not set or is empty, raising a 500 error for server misconfiguration.
+
+2.  **Sending API Key**:
+    *   Clients must send their API key in the `X-API-Key` header with each request to authenticated endpoints.
+
+Example of a request with an API key:
+```bash
+curl -X POST "http://localhost/v1/fossistant/difficulty/" \
+     -H "Content-Type: application/json" \
+     -H "X-API-Key: yourSecretKey1" \
+     -d '{"title": "Test Issue", "body": "This is a test issue body."}'
+```
+
 ## License
 
 TBD

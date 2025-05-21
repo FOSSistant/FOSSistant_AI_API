@@ -175,3 +175,5 @@ cython_debug/
 
 # Models
 models/
+
+.env

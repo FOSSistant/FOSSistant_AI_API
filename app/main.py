@@ -1,7 +1,7 @@
 import time
 
 from fastapi import FastAPI, Request
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from transformers import pipeline
 
@@ -12,7 +12,18 @@ class Issue(BaseModel):
 
 
 class Issues(BaseModel):
+    model: str = Field(default="fossistant-v0.1.0")
     issues: list[Issue]
+
+
+class Difficulty(BaseModel):
+    difficulty: str
+    score: float
+
+
+class Difficulties(BaseModel):
+    model: str
+    results: list[Difficulty]
 
 
 model = pipeline(
@@ -33,7 +44,7 @@ async def add_process_time_header(request: Request, call_next):
 
 
 @app.post("/v1/fossistant/difficulty/")
-async def predict_difficulty(issues: Issues | Issue):
+async def predict_difficulty(issues: Issues | Issue) -> Difficulties | Difficulty:
     if isinstance(issues, Issues):
         results = []
 
@@ -45,11 +56,13 @@ async def predict_difficulty(issues: Issues | Issue):
 
             result = model(text, max_length=512, truncation=True)
             results.append(
-                {
-                    "difficulty": result[0]["label"],
-                    "score": result[0]["score"],
-                }
+                Difficulty(
+                    difficulty=result[0]["label"],
+                    score=result[0]["score"],
+                ),
             )
+
+        response = Difficulties(model=issues.model, results=results)
     else:
         if issues.body:
             text = issues.title.strip() + " " + issues.body.strip()
@@ -57,9 +70,10 @@ async def predict_difficulty(issues: Issues | Issue):
             text = issues.title.strip()
 
         result = model(text, max_length=512, truncation=True)
-        results = {
-            "difficulty": result[0]["label"],
-            "score": result[0]["score"],
-        }
 
-    return results
+        response = Difficulty(
+            difficulty=result[0]["label"],
+            score=result[0]["score"],
+        )
+
+    return response

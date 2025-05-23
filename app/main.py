@@ -56,10 +56,10 @@ async def predict_difficulty(issues: Issues | Issue) -> Difficulties | Difficult
 
             result = model(text, max_length=512, truncation=True)
             results.append(
-                {
-                    "difficulty": result[0]["label"],
-                    "score": result[0]["score"],
-                }
+                Difficulty(
+                    difficulty=result[0]["label"],
+                    score=result[0]["score"],
+                ),
             )
 
         response = Difficulties(model=issues.model, results=results)

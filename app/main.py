@@ -1,7 +1,7 @@
 import time
 
 from fastapi import FastAPI, Request
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from transformers import pipeline
 
@@ -12,7 +12,7 @@ class Issue(BaseModel):
 
 
 class Issues(BaseModel):
-    model: str = "fossistant-v0.1.0"
+    model: str = Field(default="fossistant-v0.1.0")
     issues: list[Issue]
 
 

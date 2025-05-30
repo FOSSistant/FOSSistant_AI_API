@@ -10,7 +10,7 @@ from transformers import pipeline
 
 
 class Settings(BaseSettings):
-    model: str = "fossistant-v0.1.0"
+    model: str = "FOSSistant-v0.2.0"
 
     model_config = SettingsConfigDict(env_file=".env")
 

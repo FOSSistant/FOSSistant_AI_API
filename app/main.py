@@ -1,9 +1,26 @@
 import time
 
+from functools import lru_cache
+
 from fastapi import FastAPI, Request
 from pydantic import BaseModel
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from transformers import pipeline
+
+
+class Settings(BaseSettings):
+    model: str = "fossistant-v0.1.0"
+
+    model_config = SettingsConfigDict(env_file=".env")
+
+
+@lru_cache
+def get_settings():
+    return Settings()
+
+
+settings = get_settings()
 
 
 class Issue(BaseModel):
@@ -12,7 +29,7 @@ class Issue(BaseModel):
 
 
 class Issues(BaseModel):
-    model: str = "fossistant-v0.1.0"
+    model: str = settings.model
     issues: list[Issue]
 
 
@@ -28,7 +45,7 @@ class Difficulties(BaseModel):
 
 model = pipeline(
     "text-classification",
-    model="models/fossistant-v0.1.0",
+    model=f"models/{settings.model}",
 )
 
 app = FastAPI()

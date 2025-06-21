@@ -61,38 +61,25 @@ async def add_process_time_header(request: Request, call_next):
 
 
 @app.post("/v1/fossistant/difficulty/")
-async def predict_difficulty(issues: Issues | Issue) -> Difficulties | Difficulty:
+async def predict_difficulty(issues: Issues) -> Difficulties:
     INPUT_TEMPLATE = "Title: {title}\nBody: {body}"
 
-    if isinstance(issues, Issues):
-        results = []
+    results = []
 
-        for issue in issues.issues:
-            text = INPUT_TEMPLATE.format(
-                title=issue.title,
-                body=issue.body or "",
-            )
-
-            result = model(text, max_length=1024, truncation=True)
-            results.append(
-                Difficulty(
-                    difficulty=result[0]["label"],
-                    score=result[0]["score"],
-                ),
-            )
-
-        response = Difficulties(model=issues.model, results=results)
-    else:
-        if issues.body:
-            text = issues.title.strip() + " " + issues.body.strip()
-        else:
-            text = issues.title.strip()
-
-        result = model(text, max_length=512, truncation=True)
-
-        response = Difficulty(
-            difficulty=result[0]["label"],
-            score=result[0]["score"],
+    for issue in issues.issues:
+        text = INPUT_TEMPLATE.format(
+            title=issue.title,
+            body=issue.body or "",
         )
+
+        result = model(text, max_length=1024, truncation=True)
+        results.append(
+            Difficulty(
+                difficulty=result[0]["label"],
+                score=result[0]["score"],
+            ),
+        )
+
+    response = Difficulties(model=issues.model, results=results)
 
     return response

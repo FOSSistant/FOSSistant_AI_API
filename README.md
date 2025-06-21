@@ -46,4 +46,4 @@ The API documentation is available at `http://localhost/docs` when the server is
 
 ## License
 
-TBD
+This project is licensed under the Apache License 2.0.

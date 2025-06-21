@@ -10,7 +10,7 @@ from transformers import pipeline
 
 
 class Settings(BaseSettings):
-    model: str = "fossistant-v0.1.0"
+    model: str = "FOSSistant-Difficulty-Prediction-v0.3.0"
 
     model_config = SettingsConfigDict(env_file=".env")
 
@@ -62,16 +62,18 @@ async def add_process_time_header(request: Request, call_next):
 
 @app.post("/v1/fossistant/difficulty/")
 async def predict_difficulty(issues: Issues | Issue) -> Difficulties | Difficulty:
+    INPUT_TEMPLATE = "Title: {title}\nBody: {body}"
+
     if isinstance(issues, Issues):
         results = []
 
         for issue in issues.issues:
-            if issue.body:
-                text = issue.title.strip() + " " + issue.body.strip()
-            else:
-                text = issue.title.strip()
+            text = INPUT_TEMPLATE.format(
+                title=issue.title,
+                body=issue.body or "",
+            )
 
-            result = model(text, max_length=512, truncation=True)
+            result = model(text, max_length=1024, truncation=True)
             results.append(
                 Difficulty(
                     difficulty=result[0]["label"],
